@@ -1,0 +1,131 @@
+﻿@model WebShop.Models.ViewModels.ChatVM
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+
+<div class="pb-4">
+    <input type="hidden" id="hdUserId" value="@Model.UserId" />
+</div>
+<body style="text-align: center">
+    <form>
+        <input type="button" value="Start Chat" onclick="showModalWin()">
+    </form>
+
+    <div style="text-align: center" id="popupWin" class="modalwin">
+        <div class="center">
+            <div class="contacts">
+                <i class="fas fa-bars fa-2x"></i>
+                <h2>
+                    Admin Panel
+                </h2>
+                <div class="contact">
+                    <input type="hidden" id="hdchatUserId" value="" />
+
+                    <div class="list-group p-2" id="list-tab" role="tablist">
+
+                        @*Тут список юзеров*@
+
+                    </div>
+                </div>
+            </div>
+            <div class="chat">
+                <ul class="nav nav-tabs" role="tablist">
+                    @*<li class="nav-item w-45" role="presentation">
+                        <a class="nav-link active text-center" id="public-tab" onclick="setchatboxColor('mainchatTab','black')" data-bs-toggle="tab"
+                           href="#publictabbox" role="tab" aria-controls="public" aria-selected="true">
+                            PUBLIC
+                        </a>
+                    </li>*@
+                    <li class="nav-item w-50" role="presentation">
+                        <a class="nav-link text-center" id="private-tab" onclick="setchatboxColor('mainchatTab','teal')" data-bs-toggle="tab"
+                           href="#privatetabbox" role="tab" aria-controls="private" aria-selected="true">
+                            <span id="private-badge" class="badge bg-danger"></span> PRIVATE
+                        </a>
+                    </li>
+                </ul>
+                <div class="contact bar">
+                    @*@if (User.IsInRole(SD.Role_Admin))
+                    {
+                        <div class="pic stark"></div>
+                        <div class="name">
+                            Tony Stark
+                        </div>
+                        <div class="seen">
+                            Today at 12:56
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="pic stark"></div>
+                        <div class="name">
+                            Message to Admin
+                        </div>
+                        <div class="seen">
+                            Time here:
+                        </div>
+                    }*@
+                    
+                </div>
+                <div class="messages" id="chat">
+                    @*<div class="tab-pane fade show active" id="publictabbox" role="tabpanel" aria-labelledby="public-tab">
+
+                        @await Html.PartialAsync("_PublicChat",Model)
+
+                    </div>*@
+                    @*<div class="tab-pane fade" id="privatetabbox" role="tabpanel" aria-labelledby="private-tab">
+                        @await Html.PartialAsync("_PrivateChat",Model)
+
+                    </div>*@
+                    
+                        
+                            <div class="tab-content" id="nav-tabContent">
+
+                                @*@foreach(var item in Model.Input.Users)
+                                {
+                                <div class="tab-pane fade @(Model.Input.Users.First().Id == item.Id ? "show active" : "")" id="list-@(item.Id)" role="tabpanel" aria-labelledby="list-@(item.Id)-list">
+
+                                <div style="overflow: hidden;">
+                                <div class="d-block px-2 pb-2"  style="overflow-y:auto; max-height:360px">
+                                <ul style="list-style-type:none;" id="ulmessagesList@(item.Id)">
+
+                                </ul>
+                                </div>
+                                </div>
+
+
+                                </div>
+                                }   *@
+
+
+                            </div>
+                        
+                    
+                    <div class="fixed-bottom input d-flex flex-column p-4">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <label for="inputMessagePrivate" class="col-form-label">Message</label>
+                            </div>
+                            <div class="col">
+                                <input type="text" id="inputMessagePrivate" placeholder="Type your message here!" onkeyup="readyprivateMessage()" class="form-control">
+                            </div>
+                            <div class="col-auto ">
+                                <button type="button" disabled
+                                        id="btnMessagePrivate"
+                                        onclick="sendprivateMessage()"
+                                        class="btn btn-primary">
+                                    Send
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="~/js/signalr.js"></script>
+<script src="~/js/advanceChatHelper.js"></script>
+<script src="~/js/advanceChat.js"></script>
+

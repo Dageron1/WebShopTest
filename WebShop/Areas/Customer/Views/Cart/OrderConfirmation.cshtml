@@ -1,0 +1,15 @@
+﻿@model OrderHeader
+
+<div class="container row pt-4">
+    <div class="col-12 text-center">
+        <h1 class="text-primary text-center">Order Placed Successfully!</h1>
+        Your Order Number is : <b style="color:black;">@Model.Id</b> <br /><br />
+        <img src="~/images/lawn_leaf.jpg" width="65%" />
+    </div>
+    <div class="col-12 text-center" style="color:maroon">
+        <br/>
+        Your order has been placed successfully! <br/>
+        Check <b style="color:black;">@Model.ApplicationUser.Email</b> mail for information.
+    </div>
+
+</div> 

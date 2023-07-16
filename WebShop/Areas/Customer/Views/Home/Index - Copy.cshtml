@@ -1,0 +1,100 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop;
+@model IEnumerable<Product>
+@inject IJSRuntime js
+
+<div class="row pb-3">
+    @foreach (var product in Model)
+    {
+        <div class="col-lg-3 col-sm-6">
+            <div class="row p-3">
+                <div class="col-12 p-1">
+                    <div class="card border-0 p-3 shadow border-top border-3 rounded" style="width: 300px; height: 590px;">
+                      
+                        @if(product.ProductImages!=null && product.ProductImages.Count() > 0) 
+                        {
+                           @* <img src="@product.ProductImages.FirstOrDefault().ImageUrl" class="card-img-top rounded" style="max-width: 270px; max-height: 330px;" />*@
+                            <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-indicators">
+
+                                    @foreach (var imageWithIndex in
+                                   product.ProductImages
+                                   @*используем проекцию*@
+                                   .Select((image, index) => new { Image = image, Index = index }))
+                                    {
+                                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@imageWithIndex.Index"
+                                        @*if index=0 то class active*@
+                                                class="@(imageWithIndex.Index == 0 ? "active" : "")" aria-current="true" aria-label="Slide 1"></button>
+                                    }
+
+
+                                </div>
+                                <div class="carousel-inner">
+                                    @foreach (var imageWithIndex in
+                                   product.ProductImages
+                                   .Select((image, index) => new { Image = image, Index = index }))
+                                    {
+                                        <div class="@(imageWithIndex.Index==0?"carousel-item active":"carousel-item")">
+                                            <img src="@imageWithIndex.Image.ImageUrl" class="d-block w-100" alt="...">
+                                        </div>
+                                    }
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+
+                        }
+                        else 
+                        {
+                            <img src="https://placehold.co/500x600/png" class="card-img-top rounded" />
+                        }
+                        
+                        <div class="card-body pb-0">
+                            <div class="pl-0">
+                                <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@product.Title</p>
+                                <p class="card-title text-warning text-center">by <b>@product.Author</b></p>
+                            </div>
+                            <div class="pl-1">
+                                <p class="text-dark text-opacity-75 text-center mb-0">
+                                    List Price: 
+                                    <span class="text-decoration-line-through">
+                                        @product.ListPrice.ToString("c")
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="pl-1">
+                                <p class="text-dark text-opacity-75 text-center">As low as: 
+                                    <span>
+                                        @product.Price100.ToString("c")
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="w-100 btn-group" role="group">
+                            <a asp-action="Details"
+                            asp-route-productId="@product.Id"
+                            class="btn btn-primary bg-gradient border-0">
+                                <i class="bi bi-bag-check"></i> Details
+                                @if (User.IsInRole(SD.Role_Admin))
+                                {
+                                    <input asp-for="@product.Id" hidden />
+                                    <a asp-area="Customer" asp-controller="Home" asp-action="Delete" asp-route-id="@product.Id" type="submit" class="btn btn-danger mx-1">
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </a>
+                                }
+                            </a>
+                                
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
