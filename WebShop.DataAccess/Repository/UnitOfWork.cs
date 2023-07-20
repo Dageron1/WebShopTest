@@ -14,6 +14,7 @@ namespace WebShop.DataAccess.Repository
         public ICategoryRepository Category { get; private set; }
         public ICompanyRepository Company { get; private set; }
         public IProductRepository Product { get; private set; }
+        public IPromoRepository Promo { get; private set; }
         public IShoppingCartRepository ShoppingCart { get; private set; }  
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IOrderHeaderRepository OrderHeader { get; private set; }
@@ -29,7 +30,8 @@ namespace WebShop.DataAccess.Repository
             Product = new ProductRepository(_db);
             Company = new CompanyRepository(_db);   
             OrderHeader = new OrderHeaderRepository(_db);
-            OrderDetail = new OrderDetailRepository(_db);   
+            OrderDetail = new OrderDetailRepository(_db); 
+            Promo = new PromoRepository(_db);
         }
 
         public void Save()

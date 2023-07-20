@@ -14,7 +14,6 @@
                         Shopping Cart
                     </h5>
                 </div>
-
             </div>
         </div>
         <div class="card-body my-4">
@@ -23,31 +22,32 @@
             <div class="row mb-3 pb-3">
                 <div class="col-md-2 offset-md-1">
                     <a asp-area="Customer" asp-controller="Home" asp-action="Index" class="btn btn-outline-primary text-uppercase mb-5 btn-sm"><small>Continue Shopping</small></a>
-                    
                 </div>
                 <div class="col-md-10 offset-md-1">
 
-                    @foreach(var item in Model.ShoppingCartList){
+                    @foreach (var item in Model.ShoppingCartList)
+                    {
                         string id = $"a{item.ProductId}";
-                    <div class="row border-bottom pb-3">
-                        <div class="d-none d-lg-block col-lg-1 text-center py-2">
-                                @if (item.Product.ProductImages != null && item.Product.ProductImages.Count() > 0) {
+                        <div class="row border-bottom pb-3">
+                            <div class="d-none d-lg-block col-lg-1 text-center py-2">
+                                @if (item.Product.ProductImages != null && item.Product.ProductImages.Count() > 0)
+                                {
                                     <img src="@item.Product.ProductImages.FirstOrDefault().ImageUrl" class="card-img-top rounded w-100" />
                                 }
-                                else {
+                                else
+                                {
                                     <img src="https://placehold.co/500x600/png" class="card-img-top rounded w-100" />
                                 }
-                        </div>
-                        <div class="col-12 col-lg-6 pt-md-3 container">
-                            <h5 class="text-uppercase text-secondary"><strong>@item.Product.Title</strong></h5>
-                                <small><h7 class="badge badge-success" ><strong>by @item.Product.Author</strong></h7></small>
+                            </div>
+                            <div class="col-12 col-lg-6 pt-md-3 container">
+                                <h5 class="text-uppercase text-secondary"><strong>@item.Product.Title</strong></h5>
+                                <small><h7 class="badge badge-success"><strong>by @item.Product.Author</strong></h7></small>
                                 <br>
                                 <button class="btn btn-sm mt-1" style=""
                                         type="button"
                                         data-mdb-toggle="collapse"
                                         data-mdb-target="#@id"
-                                        aria-expanded="false"
-                                        >
+                                        aria-expanded="false">
                                     Opis <i class="bi bi-arrow-bar-down"></i>
                                 </button>
 
@@ -55,75 +55,89 @@
                                 <div class="collapse mt-3" id="@id">
                                     <small>@Html.Raw(item.Product.Description)</small>
                                 </div>
-                                
-                        </div>
-                        <div class="col-12  col-lg-5 text-center row">
-                            <div class="col-3 text-md-right pt-2 pt-md-4">
-                                <h6 class="fw-semibold">
-                                        @item.Price.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))
-                                    <span class="text-muted">&nbsp;x&nbsp;</span>@item.Count
-                                </h6>
                             </div>
-                            <div class="col-6 col-sm-4 col-lg-6 pt-2">
-                                <div class="w-75 btn-group" role="group">
-                                    <a asp-action="plus" asp-route-cartId="@item.Id" class="btn btn-outline-primary bg-gradient py-2">
-                                        <i class="bi bi-plus-square"></i>
-                                    </a> &nbsp;
-                                        <a asp-action="minus" asp-route-cartId="@item.Id" class="btn btn-outline-primary bg-gradient py-2">
-                                        <i class="bi bi-dash-square"></i>
-                                    </a>
+                            <div class="col-12  col-lg-5 text-center row">
+                                <div class="col-3 text-md-right pt-2 pt-md-4">
+                                    <h6 class="fw-semibold">
+                                        @item.Price.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))
+                                        <span class="text-muted">&nbsp;x&nbsp;</span>@item.Count
+                                    </h6>
                                 </div>
+                                <div class="col-6 col-sm-4 col-lg-6 pt-2">
+                                    <div class="w-75 btn-group" role="group">
+                                        <a asp-action="plus" asp-route-cartId="@item.Id" class="btn btn-outline-primary bg-gradient py-2">
+                                            <i class="bi bi-plus-square"></i>
+                                        </a> &nbsp;
+                                        <a asp-action="minus" asp-route-cartId="@item.Id" class="btn btn-outline-primary bg-gradient py-2">
+                                            <i class="bi bi-dash-square"></i>
+                                        </a>
+                                    </div>
                                     @if (User.IsInRole(SD.Role_Admin))
                                     {
                                         <div>
-
-
                                             <a href="/admin/product/upsert?id=@item.Product.Id" class="btn btn-primary mt-2 mx-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-
                                         </div>
                                     }
-                                    
-                                    
-                                    
-                            </div>
-                            <div class="col-3 col-sm-4 col-lg-2 offset-lg-1 text-right pt-2">
+                                </div>
+                                <div class="col-3 col-sm-4 col-lg-2 offset-lg-1 text-right pt-2">
                                     <a asp-action="remove" asp-route-cartId="@item.Id" class="btn btn-danger bg-gradient py-2 ">
-                                    <i class="bi bi-trash-fill"></i>
-                                </a>
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
                             </div>
+
                         </div>
-
-                    </div>
                     }
-
-
                 </div>
             </div>
-            @foreach(var item in Model.ShoppingCartList)
+
+            @if (Model.ShoppingCartList.Count() >= 1)
             {
-                if(item.Product != null)
-                {
-                    <div class="card-footer bg-white border-0">
-                        <div class="row">
-                            <div class="col-md-4 offset-md-4">
+                <div class="card-footer bg-white border-0">
+                    <div class="row">
+                        @if (Model.OrderHeader.OrderBeforeDiscount != 0)
+                        {
+                            <div class="col-md-5 offset-md-3">
                                 <ul class="list-group mb-4">
+                                    <li class="d-flex justify-content-between align-items-center">
+                                        <h5 class="text-dark fw-semibold text-uppercase"> Total (PLN):</h5>
+
+                                        <h4 class="text-decoration-line-through fw-bolder" style="color:red;">@Model.OrderHeader.OrderBeforeDiscount.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</h4>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" style="" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
+                                        </svg>
+                                        <h4 class="text-dark fw-bolder">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</h4>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 offset-md-4">
+                                <ul class="list-group mb-1">
                                     <li class="d-flex justify-content-between align-items-center">
                                         <h5 class="text-dark fw-semibold text-uppercase"> Total (PLN)</h5>
                                         <h4 class="text-dark fw-bolder">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</h4>
                                     </li>
                                 </ul>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-2 offset-md-5">
-                                <a asp-action="Summary" class="btn btn-primary border-0 bg-gradient w-100 py-2">Summary</a>
-                            </div>
-                        </div>
+                        }
                     </div>
-                    
-                }          
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-md-4">
+
+                        <input asp-for="@Model.CartPromo.Title"><button class="btn" type="submit">Add Promo</button>
+
+                        <a asp-action="Summary" class="btn btn-primary border-0 bg-gradient  py-2" style="width:77%;">Summary</a>
+
+                        @*<a  type="button" class="btn btn-primary border-0 bg-gradient w-100 py-2" href="/customer/cart/summary?ordertotal=@Model.OrderHeader.OrderTotal">Summary</a>*@
+
+                    </div>
+                </div>
             }
-            @if(Model.ShoppingCartList.Count() <= 0)
+
+            @if (Model.ShoppingCartList.Count() <= 0)
             {
                 <div class="row mt-5">
                     <div class="text-center">
@@ -131,14 +145,14 @@
                     </div>
                 </div>
             }
-            
-            
-            
-            
-            
-                
-            
-            
+
+
+
+
+
+
+
+
         </div>
 </form>
 

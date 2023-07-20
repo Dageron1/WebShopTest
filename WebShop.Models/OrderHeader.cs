@@ -20,6 +20,7 @@ namespace WebShop.Models {
         public string? OrderDate { get; set; }
         public DateTime ShippingDate { get; set; }
         public double OrderTotal { get; set; }
+        public double OrderBeforeDiscount { get; set; }
 
         public string? OrderStatus { get; set; }
         public string? PaymentStatus { get; set; }

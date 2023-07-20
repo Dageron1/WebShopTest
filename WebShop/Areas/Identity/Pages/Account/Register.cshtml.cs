@@ -193,7 +193,7 @@ namespace WebShopWeb.Areas.Identity.Pages.Account
                 user.State = Input.State;
                 user.PostalCode = Input.PostalCode;
                 user.PhoneNumber = Input.PhoneNumber;
-                user.ImageUrl = Input.ImageUrl;
+                //user.ImageUrl = Input.ImageUrl;
 
                 if (Input.Role == SD.Role_Company) {
                     user.CompanyId=Input.CompanyId;

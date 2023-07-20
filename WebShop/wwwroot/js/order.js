@@ -45,8 +45,8 @@ function loadDataTable(status) {
         "ajax": { url: '/admin/order/getall?status=' + status },
         "columns": [
             { data: 'id', "width": "3%" },
-            { data: 'name', "width": "20%" },
-            { data: 'phoneNumber', "width": "20%" },
+            { data: 'carrier', "width": "20%" },
+            { data: 'trackingNumber', "width": "20%" },
             { data: 'applicationUser.email', "width": "20%" },
             { data: 'orderDate', "width": "20%" },
             { data: 'orderStatus', "width": "10%" },
@@ -71,7 +71,8 @@ function loadDataTableAdmin(status) {
         "ajax": { url: '/admin/order/getall?status=' + status },
         "columns": [
             { data: 'id', "width": "3%" },
-            { data: 'name', "width": "20%" },
+            { data: 'trackingNumber', "width": "20%" },
+            { data: 'carrier', "width": "20%" },
             { data: 'phoneNumber', "width": "20%" },
             { data: 'applicationUser.email', "width": "20%" },
             { data: 'orderDate', "width": "20%" },
@@ -82,9 +83,9 @@ function loadDataTableAdmin(status) {
                 "render": function (data) {
                     return `<div class="w-75 btn-group" role="group">
                      <a href="/admin/order/details?orderId=${data}" class="btn btn-primary mx-1"> <i class="bi bi-pencil-square"></i></a>                    
-                     <a onClick=Delete('/admin/order/delete?orderId=${data}')  class="btn btn-danger mx-1">  <i class="bi bi-trash"></i></a>  
+                     <a onClick=Delete('/admin/order/delete?orderId=${data}')  class="btn btn-danger mx-1">  <i class="bi bi-trash"></i></a>    
                     </div>`
-                },
+                }, 
                 "width": "10%"
             }
         ]

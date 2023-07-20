@@ -80,7 +80,7 @@ namespace WebShopWeb.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
-            ImageUrl = myUser.ImageUrl;
+            //ImageUrl = myUser.ImageUrl;
             UserId = userId;
             Input = new InputModel
             {

@@ -17,6 +17,7 @@ namespace WebShop.Models
         [Required]
         public string Title { get; set; }
         public string Description { get; set; }
+        public bool IsNew { get; set; }
         [Required]
         public string ISBN { get; set; }
         [Required]

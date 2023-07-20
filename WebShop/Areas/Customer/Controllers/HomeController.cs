@@ -11,6 +11,7 @@ using WebShop.DataAcess.Data;
 using System.Net.Mail;
 using System.Net;
 
+
 namespace WebShopWeb.Areas.Customer.Controllers
 {
     [Area("Customer")]
@@ -33,6 +34,42 @@ namespace WebShopWeb.Areas.Customer.Controllers
             IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category,ProductImages");
             return View(productList);
         }
+        [Authorize]
+        [HttpPost]
+        public IActionResult Index(Product product)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ShoppingCart shoppingCart = new ShoppingCart();
+            shoppingCart.ApplicationUserId = userId;
+            shoppingCart.ProductId = product.Id;
+
+
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ApplicationUserId == userId &&
+            u.ProductId == product.Id);
+
+            if (cartFromDb != null)
+            {
+                //shopping cart exists
+                cartFromDb.Count += 1;
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+                _unitOfWork.Save();
+
+            }
+            else
+            {
+                //add cart record
+                shoppingCart.Count = 1;
+                _unitOfWork.ShoppingCart.Add(shoppingCart);
+                _unitOfWork.Save();
+                HttpContext.Session.SetInt32(SD.SessionCart,
+                _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId).Count());
+            }
+            TempData["success"] = "Cart updated successfully";
+
+            return RedirectToAction(nameof(Index));
+        }
+        
         [Authorize]
         public IActionResult Help()
         {

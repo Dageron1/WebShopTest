@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.JSInterop;
 @using System.Globalization;
+
 @model IEnumerable<Product>
 @inject IJSRuntime js
 
@@ -13,11 +14,12 @@
         <div class="col-lg-3 col-sm-6 d-flex align-items-stretch ">
             <div class="row p-3 ">
                 <div class="col-12 p-1 ">
-                    <div id="card" class="card border-0 p-3 shadow border-top border-3 rounded" style="width: 100%; height: 100%; align-items: stretch; display:flex">
-
+                    <div id="card" class="card border-0 p-3 shadow border-top border-3 rounded" style="width: 100%; height: 100%; align-items: stretch; display:flex;"> 
                         @if (product.ProductImages != null && product.ProductImages.Count() > 0)
                         {
+                           
                             @* <img src="@product.ProductImages.FirstOrDefault().ImageUrl" class="card-img-top rounded" style="max-width: 270px; max-height: 330px;" />*@
+                            
                             <div id="@id" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-indicators">
 
@@ -37,9 +39,14 @@
                                     {
                                         <div class="@(imageWithIndex.Index==0?"carousel-item active":"carousel-item")">
                                             <img align="middle" style="width: 100%; height: 100%; margin: 3% auto 0%;" src="@imageWithIndex.Image.ImageUrl" class="d-block " alt="...">
+                                            
                                         </div>
                                     }
                                 </div>
+                                @if(product.IsNew == true){
+                                    <span class="badge badge1 badge-danger float-left" style="position: absolute; top: 5%; left: 3%;">New</span>
+                                }
+                                
                                 <button class="carousel-control-prev" type="button" data-bs-target="#@id" data-bs-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">Previous</span>
@@ -59,12 +66,12 @@
                         <div class="card-body pb-0">
                             <div class="pl-0">
                                 <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@product.Title</p>
-                                <p class="card-title text-warning text-center">by <b>@product.Author</b></p>
+                                <p class="card-title text-center" style="color:cadetblue">by <b>@product.Author</b></p>
                             </div>
                             <div class="pl-1">
                                 <p class="text-dark text-opacity-75 text-center mb-0">
                                     List Price:
-                                    <span class="text-decoration-line-through">
+                                    <span class="text-decoration-line-through" style="color:crimson;">
                                         @product.ListPrice.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))
                                     </span>
                                 </p>
@@ -72,8 +79,10 @@
                             <div class="pl-1">
                                 <p class="text-dark text-opacity-75 text-center">
                                     As low as:
-                                    <span>
-                                        @product.Price100.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))
+                                    <span><b>
+                                            @product.Price100.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))
+                                    </b>
+                                       
                                     </span>
                                 </p>
                             </div>
@@ -91,7 +100,19 @@
                                     </a>
                                 }
                             </a>
-
+                            @{
+                                if(!User.IsInRole(SD.Role_Admin))
+                                {
+                                    <form method="post">
+                                        <input hidden asp-for="@product.Id" />
+                                        <button type="submit" asp-action="Index" asp-route-productId="@product.Id" asp-area="Customer" asp-controller="Home" class="btn" style="border:15px; border-color:black;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-plus-fill" viewBox="0 0 16 16">
+                                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM9 5.5V7h1.5a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0V8H6.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0z" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                }                             
+                            }                         
                         </div>
 
                     </div>
@@ -101,6 +122,69 @@
     }
 </div>
 
+@section Scripts
+    {
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+            .slider.round:before {
+                border-radius: 50%;
+            }
+    </style>
+}
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/signalr.js"></script> @*подключаем клиент сайд библиотеку внутри представления*@

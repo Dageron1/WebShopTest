@@ -23,7 +23,6 @@ namespace WebShop.Models {
         public Company? Company { get; set; }
         [NotMapped]
         public string Role { get; set; }
-        [ValidateNever]
-        public string? ImageUrl { get; set; }
+        
     }
 }
