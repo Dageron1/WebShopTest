@@ -21,11 +21,13 @@ namespace WebShop.Models {
         public DateTime ShippingDate { get; set; }
         public double OrderTotal { get; set; }
         public double OrderBeforeDiscount { get; set; }
+        public int Discount { get; set; }
 
         public string? OrderStatus { get; set; }
         public string? PaymentStatus { get; set; }
         public string? TrackingNumber { get; set; }
         public string? Carrier { get; set; }
+        public string? PromoCode { get; set; }
 
         public DateTime PaymentDate { get; set; }
         public DateTime PaymentDueDate { get; set; }

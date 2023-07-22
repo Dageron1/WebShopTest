@@ -15,7 +15,7 @@
 						</h5>
 					</div>
 					<div class="col-6 text-end">
-						<a asp-action="Index" class="btn btn-outline-danger btn-sm">Back to Cart</a>
+						<a asp-action="Index" class="btn btn-outline-danger text-dark btn-sm">Back to Cart</a>
 					</div>
 				</div>
 			</div>
@@ -97,11 +97,33 @@
 										<span class="text-muted">@((details.Price * details.Count).ToString("c", CultureInfo.CreateSpecificCulture("pl-PL")))</span>
 								</li>
 								}
+								@if(Model.CartPromo.Title != null)
+								{
+									<li class="list-group-item d-flex justify-content-between bg-light">
+										<small class="text-info">Promo Code:
+											<strong class="text" style="color:indianred;">@Model.CartPromo.Title.ToString()</strong>
+										</small>
 
-								<li class="list-group-item d-flex justify-content-between bg-light">
-									<small class="text-info">Total (PLN)</small>
-									<strong class="text-info">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</strong>
-								</li>
+
+
+										<strong class="text-info">Discount: <span style="color:gray;">@Model.CartPromo.Discount%</span></strong>
+									</li>
+									<li class="list-group-item d-flex justify-content-between bg-light">
+										<small class="text-info">Total (PLN)</small>
+
+										<strong class="text-decoration-line-through" style="color:indianred;">@Model.OrderHeader.OrderBeforeDiscount.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</strong>
+										<i class="bi bi-arrow-right"></i>
+										<strong class="text-black" style="color:black;">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</strong>
+									</li>
+								}
+								else
+								{
+									<li class="list-group-item d-flex justify-content-between bg-light">
+										<small class="text-info">Total (PLN)</small>
+										<strong class="text-info">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</strong>
+									</li>
+								}
+								
 							</ul>
 						</div>
 					</div>

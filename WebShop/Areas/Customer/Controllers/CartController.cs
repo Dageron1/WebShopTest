@@ -96,6 +96,7 @@ namespace WebShopWeb.Areas.Customer.Controllers
                 {
                     TempData["success"] = "Promo code accepted";
                     TempData["Promo"] = findPromo.Title.ToString().ToLower();
+                    TempData["PromoRAW"] = findPromo.Title;
                     foreach (var cart in ShoppingCartVM.ShoppingCartList)
                     {
                         cart.Product.ProductImages = productImages.Where(u => u.ProductId == cart.Product.Id).ToList();
@@ -185,7 +186,9 @@ namespace WebShopWeb.Areas.Customer.Controllers
         {
 
             var promoCode = TempData["Promo"];
-            var findPromo = _unitOfWork.Promo.Get(p => p.Title.ToLower() == promoCode);
+            var rawPromo = TempData["PromoRAW"];
+
+			var findPromo = _unitOfWork.Promo.Get(p => p.Title.ToLower() == promoCode);
             if (findPromo != null)
             {
                 TempData["AppliedPromo"] = findPromo.Title.ToString().ToLower();
@@ -193,13 +196,34 @@ namespace WebShopWeb.Areas.Customer.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-
-            ShoppingCartVM = new()
+            if(findPromo != null)
             {
-                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
-                includeProperties: "Product"),
-                OrderHeader = new()
-            };
+				ShoppingCartVM = new()
+				{
+					ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
+				includeProperties: "Product"),
+					OrderHeader = new(),
+					CartPromo = new()
+					{
+						Title = findPromo.Title,
+                        Discount = findPromo.Discount
+					}
+				};
+			}
+            else
+            {
+				ShoppingCartVM = new()
+				{
+					ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
+				includeProperties: "Product"),
+					OrderHeader = new(),
+					CartPromo = new()
+					{
+						Title = null,
+					}
+				};
+			}
+            
 
             ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
 
@@ -211,13 +235,15 @@ namespace WebShopWeb.Areas.Customer.Controllers
             ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
 
 
+
             if (findPromo != null)
             {
                 foreach (var cart in ShoppingCartVM.ShoppingCartList)
                 {
                     cart.Price = GetPriceBasedOnQuantity(cart);
+                    ShoppingCartVM.OrderHeader.OrderBeforeDiscount += (cart.Price * cart.Count);
                     ShoppingCartVM.OrderHeader.OrderTotal += ((cart.Price * cart.Count) - ((cart.Price * cart.Count) / 100 * findPromo.Discount));
-                }
+				}
             }
             else
             {
@@ -235,7 +261,7 @@ namespace WebShopWeb.Areas.Customer.Controllers
         [ActionName("Summary")]
         public IActionResult SummaryPOST()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
+			var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var promoCode = TempData["AppliedPromo"];
@@ -257,7 +283,10 @@ namespace WebShopWeb.Areas.Customer.Controllers
                 {
                     cart.Price = GetPriceBasedOnQuantity(cart);
                     ShoppingCartVM.OrderHeader.OrderTotal += ((cart.Price * cart.Count) - ((cart.Price * cart.Count) / 100 * findPromo.Discount));
+                    ShoppingCartVM.OrderHeader.PromoCode = findPromo.Title.ToString();
+                    ShoppingCartVM.OrderHeader.Discount = findPromo.Discount;
                 }
+                
             }
             else
             {
@@ -281,8 +310,8 @@ namespace WebShopWeb.Areas.Customer.Controllers
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
             }
             _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
-            _unitOfWork.Save();
-            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+			_unitOfWork.Save();
+			foreach (var cart in ShoppingCartVM.ShoppingCartList)
             {
                 OrderDetail orderDetail = new()
                 {

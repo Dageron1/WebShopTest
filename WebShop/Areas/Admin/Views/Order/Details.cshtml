@@ -205,16 +205,45 @@
                                         </div>
                                     </li>
                                 }
-                                <li class="list-group-item bg-primary">
-                                    <div class="row container">
-                                        <div class="col-6 mt-1">
-                                            <h5 class="text-white">TOTAL </h5>
+                                @if(Model.OrderHeader.PromoCode != null)
+                                {
+                                    <li class="list-group-item bg-body-secondary">
+                                        <div class="row container">
+                                            <div class="col-6 mt-1">
+                                                <small class="text-black fw-semibold">Promo Code: <span style="color:darkgreen;">@Model.OrderHeader.PromoCode</span></small>
+                                            </div>
+                                            <div class="col-6 text-end mt-1">
+                                                <small class="text-black fw-semibold">Discount: @Model.OrderHeader.Discount %</small>
+                                            </div>
+
                                         </div>
-                                        <div class="col-6 text-end mt-1">
-                                            <h5 class="text-white">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</h5>
+                                    </li>
+                                    <li class="list-group-item bg-primary">
+                                        <div class="row container">
+                                            <div class="col-6 mt-1">
+                                                <h5 class="text-white">TOTAL </h5>
+                                            </div>
+                                            <div class="col-6 text-end mt-1">
+                                                <h5 class="text-white">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</h5>
+                                            </div>
+
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="list-group-item bg-primary">
+                                        <div class="row container">
+                                            <div class="col-6 mt-1">
+                                                <h5 class="text-white">TOTAL </h5>
+                                            </div>
+                                            <div class="col-6 text-end mt-1">
+                                                <h5 class="text-white">@Model.OrderHeader.OrderTotal.ToString("c", CultureInfo.CreateSpecificCulture("pl-PL"))</h5>
+                                            </div>
+
+                                        </div>
+                                    </li>
+                                } 
                             </ul>
 
                             @if (Model.OrderHeader.PaymentStatus == SD.PaymentStatusDelayedPayment &&

@@ -46,3 +46,19 @@ function Delete(url) {
         }
     })
 }
+
+function readyPromoCode() {
+    let inputMsg = document.getElementById("inputPromoCode");
+
+    let sendButton = document.getElementById("sendPromoCode");
+    if (/^\s/.test(inputMsg.value)) {
+        inputMsg.value = '';
+        sendButton.disabled = true;
+    } else {
+        sendButton.disabled = false;
+    }
+}
+function sendPromo() {
+    let inputMsg = document.getElementById("inputPromoCode");
+    inputMsg.value = "";
+}
