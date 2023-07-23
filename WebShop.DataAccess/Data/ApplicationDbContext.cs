@@ -25,7 +25,7 @@ namespace WebShop.DataAcess.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            //needed because keys of identity table are mapped in the OnModelCreating of identity dbcontext
 			base.OnModelCreating(modelBuilder);
 
 			modelBuilder.Entity<Category>().HasData(

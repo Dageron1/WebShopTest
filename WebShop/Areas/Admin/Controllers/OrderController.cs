@@ -106,26 +106,31 @@ namespace WebShop.Areas.Admin.Controllers {
             _unitOfWork.OrderHeader.Update(orderHeader);
             _unitOfWork.Save();
             var userEmail = orderHeader.ApplicationUser.Email;
+            //when we are working with smtp client, best practice is to enclose that in a using statment
+            //that automaticalli dispose of the client once that block is executed
+            using (var smtpClient = new SmtpClient("smtp.gmail.com", 587))
+            {
+                //smtpClient.Host = "smtp.gmail.com";
+                //smtpClient.Port = 587;
+                smtpClient.Credentials = new NetworkCredential("stryhaliouyauheni@gmail.com", "ejjqyssmdgbtqrxq");
+                smtpClient.EnableSsl = true;
 
-            SmtpClient smtpClient = new SmtpClient();
-            smtpClient.Host = "smtp.gmail.com";
-            smtpClient.Port = 587;
-            smtpClient.Credentials = new NetworkCredential("stryhaliouyauheni@gmail.com", "ejjqyssmdgbtqrxq");
-            smtpClient.EnableSsl = true;
-
-            MailMessage message = new MailMessage();
-            message.To.Add(userEmail);
-            message.Subject = $"Order number - {orderHeader.Id}";
-            message.From = new MailAddress("support@dagerondev.com");
-            message.Body = $"<html><body>New information about your order." +
-                $"<p><b>Tracking Number: {orderHeader.TrackingNumber}</b></p>" +
-                $"<p><b>Carrier: {orderHeader.Carrier}</b></p>" +
-                $"<p>Shipping Date: {orderHeader.ShippingDate}</p>" +
-                $"<p><Estimated delivery time 3 days from the date of dispatch.</p></body></html>";
-            message.IsBodyHtml = true;
-            smtpClient.Send(message);
+                MailMessage message = new MailMessage();
+                message.To.Add(userEmail);
+                message.Subject = $"Order number - {orderHeader.Id}";
+                message.From = new MailAddress("support@dagerondev.com");
+                message.Body = $"<html><body>New information about your order." +
+                    $"<p><b>Tracking Number: {orderHeader.TrackingNumber}</b></p>" +
+                    $"<p><b>Carrier: {orderHeader.Carrier}</b></p>" +
+                    $"<p>Shipping Date: {orderHeader.ShippingDate}</p>" +
+                    $"<p><Estimated delivery time 3 days from the date of dispatch.</p></body></html>";
+                message.IsBodyHtml = true;
+                smtpClient.Send(message);
+            }
+            
 
             TempData["Success"] = "Order Shipped Successfully.";
+            //лучше использовать nameof вместо хард кода(magic strings)
             return RedirectToAction(nameof(Details), new { orderId = OrderVM.OrderHeader.Id });
         }
         [HttpPost]

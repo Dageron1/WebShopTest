@@ -23,7 +23,7 @@ namespace WebShop.Utility {
 
             //var client = new SendGridClient(SendGridSecret);
 
-            //var from = new EmailAddress("hello@dotnetmastery.com", "Bulky Book");
+            
             //var to = new EmailAddress(email);
             //var message = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
 
