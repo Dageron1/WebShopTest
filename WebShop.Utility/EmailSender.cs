@@ -9,30 +9,27 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using System.Net;
+using System.Net.Http;
 
-namespace WebShop.Utility {
-    public class EmailSender : IEmailSender {
+namespace WebShop.Utility
+{
+    public class EmailSender : IEmailSender
+    {
         //public string SendGridSecret { get; set; }
 
         //public EmailSender(IConfiguration _config) {
         //    SendGridSecret = _config.GetValue<string>("SendGrid:SecretKey");
         //}
 
-        public Task SendEmailAsync(string email, string subject, string htmlMessage) {
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
             //logic to send email
 
             //var client = new SendGridClient(SendGridSecret);
 
-            
+
             //var to = new EmailAddress(email);
             //var message = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
-
-
-            SmtpClient smtpClient = new SmtpClient();
-            smtpClient.Host = "smtp.gmail.com";
-            smtpClient.Port = 587;
-            smtpClient.Credentials = new NetworkCredential("stryhaliouyauheni@gmail.com", "ejjqyssmdgbtqrxq");
-            smtpClient.EnableSsl = true;
 
             MailMessage message = new MailMessage();
             message.To.Add(email);
@@ -40,8 +37,17 @@ namespace WebShop.Utility {
             message.From = new MailAddress("support@dagerondev.com");
             message.Body = $"<html><body> {htmlMessage}</body></html>";
             message.IsBodyHtml = true;
-            return smtpClient.SendMailAsync(message);
 
+
+            using (var smtpClient = new SmtpClient())
+            {
+                smtpClient.Host = "smtp.gmail.com";
+                smtpClient.Port = 587;
+                smtpClient.Credentials = new NetworkCredential("stryhaliouyauheni@gmail.com", "ejjqyssmdgbtqrxq");
+                smtpClient.EnableSsl = true;
+
+                await smtpClient.SendMailAsync(message);
+            }
 
         }
     }

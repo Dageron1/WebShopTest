@@ -1,15 +1,87 @@
-﻿@model OrderHeader
+﻿@model OrderVM
 
 <div class="container row pt-4">
     <div class="col-12 text-center">
         <h1 class="text-primary text-center">Order Placed Successfully!</h1>
-        Your Order Number is : <b style="color:black;">@Model.Id</b> <br /><br />
-        <img src="~/images/lawn_leaf.jpg" width="65%" />
+        
+        Your Order Number is : <b style="color:black;">@Model.OrderHeader.Id</b> <br /><br />
+        @*<img src="~/images/lawn_leaf.jpg" width="65%" />*@
+        <table class="mt-5 table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Image
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Author
+                    </th>
+                    <th width="30">
+                        Count
+                    </th>
+                    <th width="200">
+                        Price for one
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in Model.OrderDetail)
+                {
+                    <tr>
+                        <td width="30">
+                            <img src="@item.Product.ProductImages.FirstOrDefault().ImageUrl" class="card-img-top rounded" />
+                        </td>
+                        <td>
+                            @item.Product.Title
+                        </td>
+                        <td>
+                            @item.Product.Author
+                        </td>
+                        <td>
+                            @item.Count
+                        </td>
+                        <td>
+                            @item.Product.Price Zł
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            @if (!string.IsNullOrEmpty(Model.OrderHeader.PromoCode))
+            {
+                <tfoot>
+                    <tr>
+
+
+                        <td colspan="3" class="fw-bold" style="color:forestgreen;">
+                            <span class="fw-bold" style="color:deepskyblue"> Promo: </span>@Model.OrderHeader.PromoCode <i style="color:black;font-size: 0.9rem;" class="bi bi-arrow-right"></i>
+                            <span style="color:darkslateblue;">Discount: @Model.OrderHeader.Discount %</span></td>
+                        
+                        <td class="text-black fw-bold">Total</td>
+                        <th class="text-black fw-bold"><span class="text-decoration-line-through" style="color:darkred;">@Model.OrderHeader.OrderBeforeDiscount Zł </span> <br>  @Model.OrderHeader.OrderTotal Zł</th>
+                    </tr>
+                </tfoot>
+            }
+            else
+            {
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <td class="text-black fw-bold">Total</td>
+                        <td class="text-black fw-bold">@Model.OrderHeader.OrderTotal Zł</td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
     </div>
-    <div class="col-12 text-center" style="color:maroon">
+    <div class="col-12 text-center mt-5" style="color:maroon">
         <br/>
         Your order has been placed successfully! <br/>
-        Check <b style="color:black;">@Model.ApplicationUser.Email</b> mail for information.
+        @*Check <b style="color:black;">@Model.ApplicationUser.Email</b> mail for information.*@
+        Check <b style="color:black;">@Model.OrderHeader.ApplicationUser.Email</b> mail for information.
     </div>
 
 </div> 

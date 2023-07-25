@@ -95,7 +95,7 @@
             {
                 <div class="card-footer bg-white border-0">
                     <div class="row">
-                        @if (Model.OrderHeader.OrderBeforeDiscount != 0)
+                        @if (!string.IsNullOrEmpty(Model.OrderHeader.PromoCode))
                         {
                             <div class="col-md-12 offset-md-3">
                                 <ul class="list-group">

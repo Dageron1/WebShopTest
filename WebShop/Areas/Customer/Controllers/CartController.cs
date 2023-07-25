@@ -13,6 +13,10 @@ using System.Net.Mail;
 using System.Net;
 using Stripe;
 using Microsoft.AspNetCore.Hosting;
+using WebShop.DataAcess.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WebShopWeb.Areas.Customer.Controllers
 {
@@ -21,17 +25,20 @@ namespace WebShopWeb.Areas.Customer.Controllers
     [Authorize]
     public class CartController : Controller
     {
-
+        ApplicationDbContext context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEmailSender _emailSender;
         private readonly IHubContext<OrderHub> _orderHub;
         [BindProperty]
+        public OrderVM OrderVM { get; set; }
+        [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
-        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender, IHubContext<OrderHub> orderHub)
+        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender, IHubContext<OrderHub> orderHub, ApplicationDbContext db)
         {
             _unitOfWork = unitOfWork;
             _emailSender = emailSender;
             _orderHub = orderHub;
+            context = db;
         }
 
 
@@ -77,7 +84,7 @@ namespace WebShopWeb.Areas.Customer.Controllers
             IEnumerable<ProductImage> productImages = _unitOfWork.ProductImage.GetAll();
 
 
-            if (promo?.CartPromo.Title != null)
+            if (!string.IsNullOrEmpty(promo?.CartPromo.Title))
             {
 
                 var findPromo = _unitOfWork.Promo.Get(p => p.Title.ToLower() == promo.CartPromo.Title.ToLower());
@@ -90,6 +97,8 @@ namespace WebShopWeb.Areas.Customer.Controllers
                         cart.Product.ProductImages = productImages.Where(u => u.ProductId == cart.Product.Id).ToList();
                         cart.Price = GetPriceBasedOnQuantity(cart);
                         ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+                        ShoppingCartVM.OrderHeader.OrderBeforeDiscount += (cart.Price * cart.Count);
+                        ShoppingCartVM.OrderHeader.PromoCode = null;
                     }
                 }
                 if (findPromo != null)
@@ -101,8 +110,10 @@ namespace WebShopWeb.Areas.Customer.Controllers
                     {
                         cart.Product.ProductImages = productImages.Where(u => u.ProductId == cart.Product.Id).ToList();
                         cart.Price = GetPriceBasedOnQuantity(cart);
-                        ShoppingCartVM.OrderHeader.OrderBeforeDiscount += (cart.Price * cart.Count);
+                        TempData["PriceDiscount"] = ShoppingCartVM.OrderHeader.OrderBeforeDiscount += (cart.Price * cart.Count);
                         ShoppingCartVM.OrderHeader.OrderTotal += ((cart.Price * cart.Count) - ((cart.Price * cart.Count) / 100 * findPromo.Discount));
+                        ShoppingCartVM.OrderHeader.PromoCode = findPromo.ToString();
+                        
 
                     }
                 }
@@ -121,6 +132,7 @@ namespace WebShopWeb.Areas.Customer.Controllers
 
             return View(ShoppingCartVM);
         }
+        //[Route("Customer/Cart/Promo")]
         public IActionResult Promo()
         {
             List<PromoCode> objPromoList = _unitOfWork.Promo.GetAll().ToList();
@@ -283,6 +295,7 @@ namespace WebShopWeb.Areas.Customer.Controllers
                 {
                     cart.Price = GetPriceBasedOnQuantity(cart);
                     ShoppingCartVM.OrderHeader.OrderTotal += ((cart.Price * cart.Count) - ((cart.Price * cart.Count) / 100 * findPromo.Discount));
+                    ShoppingCartVM.OrderHeader.OrderBeforeDiscount += (cart.Price * cart.Count);
                     ShoppingCartVM.OrderHeader.PromoCode = findPromo.Title.ToString();
                     ShoppingCartVM.OrderHeader.Discount = findPromo.Discount;
                 }
@@ -421,10 +434,15 @@ namespace WebShopWeb.Areas.Customer.Controllers
 
         public async Task<IActionResult> OrderConfirmation(int id)
         {
-
-
+            var priceWithDiscount = TempData["PriceDiscount"];
+            var oldPrice = priceWithDiscount;
             OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
+            //IEnumerable<OrderDetail> orderDetails = _unitOfWork.OrderDetail.GetAll(u => u.OrderHeader.Id == id, includeProperties: "Product,OrderHeader").ToList();
+            IEnumerable<OrderDetail> orderDetails = context.OrderDetails.Include(o => o.Product).ThenInclude(o => o.ProductImages).Include(o => o.OrderHeader).AsNoTracking().Where(u => u.OrderHeader.Id == id).ToList();
+            
             var userEmail = orderHeader.ApplicationUser.Email;
+            
+            
             if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
                 //this is an order by customer
@@ -474,9 +492,13 @@ namespace WebShopWeb.Areas.Customer.Controllers
             //message.IsBodyHtml = true;
             //smtpClient.Send(message);
 
-
-
-            return View(orderHeader);
+            OrderVM orderVM = new()
+            {
+                OrderHeader = orderHeader,
+                OrderDetail = orderDetails, 
+                
+            };            
+            return View(orderVM);
         }
 
 
