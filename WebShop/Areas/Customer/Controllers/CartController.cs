@@ -438,7 +438,13 @@ namespace WebShopWeb.Areas.Customer.Controllers
             var oldPrice = priceWithDiscount;
             OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
             //IEnumerable<OrderDetail> orderDetails = _unitOfWork.OrderDetail.GetAll(u => u.OrderHeader.Id == id, includeProperties: "Product,OrderHeader").ToList();
-            IEnumerable<OrderDetail> orderDetails = context.OrderDetails.Include(o => o.Product).ThenInclude(o => o.ProductImages).Include(o => o.OrderHeader).AsNoTracking().Where(u => u.OrderHeader.Id == id).ToList();
+            IEnumerable<OrderDetail> orderDetails = context.OrderDetails
+                .Include(o => o.Product)
+                .ThenInclude(o => o.ProductImages)
+                .Include(o => o.OrderHeader)
+                .AsSplitQuery()
+                .AsNoTracking()
+                .Where(u => u.OrderHeader.Id == id).ToList();
             
             var userEmail = orderHeader.ApplicationUser.Email;
             
